@@ -1,0 +1,13 @@
+mkdir crypto-price-bot
+cd crypto-price-bot
+npm init -y
+npm install express node-telegram-bot-api axios dotenv 
+git init 
+git add . 
+git commit -m "Initial commit: Crypto price bot" 
+git remote add origin https://github.com/YOUR_USERNAME/crypto-price-bot.git
+git branch -M main
+git push -u origin main 
+git status 
+git rm --cached .env
+git commit -m "Remove .env file" 

@@ -26,18 +26,34 @@ async function getCryptoPrices() {
     }
 }
 
-// Function to format message
+// Function to format message with copyable prices
 function formatPriceMessage(prices) {
     if (!prices) return '❌ Error fetching prices';
     
     return `🚀 Crypto Prices Update 🚀\n
-Bitcoin: $${prices.bitcoin.usd.toLocaleString()}
-Ethereum: $${prices.ethereum.usd.toLocaleString()}
-BNB: $${prices.binancecoin.usd.toLocaleString()}
-XRP: $${prices.ripple.usd.toLocaleString()}
-Cardano: $${prices.cardano.usd.toLocaleString()}
-Node-Coin: $${prices.nodecoin.usd.toLocaleString()}\n
+Bitcoin: \`$${prices.bitcoin.usd.toLocaleString()}\`
+Ethereum: \`$${prices.ethereum.usd.toLocaleString()}\`
+BNB: \`$${prices.binancecoin.usd.toLocaleString()}\`
+XRP: \`$${prices.ripple.usd.toLocaleString()}\`
+Cardano: \`$${prices.cardano.usd.toLocaleString()}\`
+Node-Coin: \`$${prices.nodecoin.usd.toLocaleString()}\`\n
 ⏰ Updated at: ${new Date().toLocaleString()}`;
+}
+
+// Update the sendTelegramMessage function to enable Markdown parsing
+async function sendTelegramMessage(message, retries = 3) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            const result = await bot.sendMessage(CHAT_ID, message, {
+                parse_mode: 'Markdown'
+            });
+            return result;
+        } catch (error) {
+            console.error(`Attempt ${i + 1} failed:`, error);
+            if (i === retries - 1) throw error;
+            await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+        }
+    }
 }
 
 // Endpoint to trigger price update
@@ -45,13 +61,16 @@ app.get('/api/update', async (req, res) => {
     try {
         console.log('Fetching crypto prices...');
         const prices = await getCryptoPrices();
-        console.log('Prices received:', prices);
         
+        if (prices?.error) {
+            return res.status(429).json({ success: false, error: prices.error });
+        }
+        
+        console.log('Prices received:', prices);
         const message = formatPriceMessage(prices);
         console.log('Formatted message:', message);
         
-        console.log('Sending to Telegram. Chat ID:', CHAT_ID);
-        const result = await bot.sendMessage(CHAT_ID, message);
+        const result = await sendTelegramMessage(message);
         console.log('Telegram response:', result);
         
         res.json({ 

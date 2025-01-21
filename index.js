@@ -10,13 +10,14 @@ const port = process.env.PORT || 3000;
 const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: false });
 const CHAT_ID = process.env.CHAT_ID;
 
-// Function to fetch crypto prices
+// Function to fetch crypto prices and market caps
 async function getCryptoPrices() {
     try {
         const response = await axios.get('https://api.coingecko.com/api/v3/simple/price', {
             params: {
                 ids: 'bitcoin,ethereum,binancecoin,ripple,cardano,nodecoin',
-                vs_currencies: 'usd'
+                vs_currencies: 'usd',
+                include_market_cap: true
             }
         });
         return response.data;
@@ -26,18 +27,50 @@ async function getCryptoPrices() {
     }
 }
 
-// Function to format message with copyable prices
+// Function to format large numbers (billions/millions)
+function formatMarketCap(marketCap) {
+    if (marketCap >= 1e12) {
+        return `$${(marketCap / 1e12).toFixed(2)}T`;
+    } else if (marketCap >= 1e9) {
+        return `$${(marketCap / 1e9).toFixed(2)}B`;
+    } else if (marketCap >= 1e6) {
+        return `$${(marketCap / 1e6).toFixed(2)}M`;
+    } else {
+        return `$${marketCap.toLocaleString()}`;
+    }
+}
+
+// Function to format message with copyable prices, market caps, and username
 function formatPriceMessage(prices) {
     if (!prices) return '❌ Error fetching prices';
     
-    return `🚀 Crypto Prices Update 🚀\n
-Bitcoin: \`$${prices.bitcoin.usd.toLocaleString()}\`
-Ethereum: \`$${prices.ethereum.usd.toLocaleString()}\`
-BNB: \`$${prices.binancecoin.usd.toLocaleString()}\`
-XRP: \`$${prices.ripple.usd.toLocaleString()}\`
-Cardano: \`$${prices.cardano.usd.toLocaleString()}\`
-Node-Coin: \`$${prices.nodecoin.usd.toLocaleString()}\`\n
-⏰ Updated at: ${new Date().toLocaleString()}`;
+    return `🚀 *Crypto Prices Update* 🚀\n
+*Bitcoin*
+Price: \`$${prices.bitcoin.usd.toLocaleString()}\`
+Market Cap: \`${formatMarketCap(prices.bitcoin.usd_market_cap)}\`
+
+*Ethereum*
+Price: \`$${prices.ethereum.usd.toLocaleString()}\`
+Market Cap: \`${formatMarketCap(prices.ethereum.usd_market_cap)}\`
+
+*BNB*
+Price: \`$${prices.binancecoin.usd.toLocaleString()}\`
+Market Cap: \`${formatMarketCap(prices.binancecoin.usd_market_cap)}\`
+
+*XRP*
+Price: \`$${prices.ripple.usd.toLocaleString()}\`
+Market Cap: \`${formatMarketCap(prices.ripple.usd_market_cap)}\`
+
+*Cardano*
+Price: \`$${prices.cardano.usd.toLocaleString()}\`
+Market Cap: \`${formatMarketCap(prices.cardano.usd_market_cap)}\`
+
+*Node-Coin*
+Price: \`$${prices.nodecoin.usd.toLocaleString()}\`
+Market Cap: \`${formatMarketCap(prices.nodecoin.usd_market_cap)}\`\n
+⏰ Updated at: ${new Date().toLocaleString()}\n
+📱 *Join us on Telegram*: @trumpXbtc24
+💬 *Contact for queries*: @nastydeed`;
 }
 
 // Update the sendTelegramMessage function to enable Markdown parsing

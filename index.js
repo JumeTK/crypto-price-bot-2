@@ -19,7 +19,6 @@ async function getCryptoPrices() {
                 vs_currencies: 'usd'
             }
         });
-        
         return response.data;
     } catch (error) {
         console.error('Error fetching prices:', error);
@@ -41,29 +40,33 @@ Node-Coin: $${prices.nodecoin.usd.toLocaleString()}\n
 ⏰ Updated at: ${new Date().toLocaleString()}`;
 }
 
-// Function to send price update
-async function sendPriceUpdate() {
-    const prices = await getCryptoPrices();
-    const message = formatPriceMessage(prices);
-    
+// Endpoint to trigger price update
+app.get('/api/update', async (req, res) => {
     try {
+        const prices = await getCryptoPrices();
+        const message = formatPriceMessage(prices);
         await bot.sendMessage(CHAT_ID, message);
+        res.json({ success: true, message: 'Price update sent successfully' });
     } catch (error) {
-        console.error('Error sending message:', error);
+        console.error('Error:', error);
+        res.status(500).json({ success: false, error: 'Failed to send price update' });
     }
-}
-
-// Set up periodic updates (every minute)
-setInterval(sendPriceUpdate, 60000);
+});
 
 // Basic endpoint to keep the server alive
 app.get('/', (req, res) => {
     res.send('Crypto Price Bot is running!');
 });
 
+// Export the Express app
+module.exports = app;
+
 // Start the server
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
     // Send initial price update
-    sendPriceUpdate();
+    getCryptoPrices().then(prices => {
+        const message = formatPriceMessage(prices);
+        bot.sendMessage(CHAT_ID, message);
+    });
 }); 

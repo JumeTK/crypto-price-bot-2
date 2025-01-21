@@ -69,8 +69,8 @@ Market Cap: \`${formatMarketCap(prices.cardano.usd_market_cap)}\`
 Price: \`$${prices.nodecoin.usd.toLocaleString()}\`
 Market Cap: \`${formatMarketCap(prices.nodecoin.usd_market_cap)}\`\n
 ⏰ Updated at: ${new Date().toLocaleString()}\n
-📱 *Join us on Telegram*: @trumpXbtc24
-💬 *Contact for queries*: @nastydeed`;
+📱 *Join us on Telegram*: trumpXbtc24
+💬 *Contact for queries*: nastydeed`;
 }
 
 // Update the sendTelegramMessage function to enable Markdown parsing

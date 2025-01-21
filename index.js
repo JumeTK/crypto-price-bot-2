@@ -43,14 +43,44 @@ Node-Coin: $${prices.nodecoin.usd.toLocaleString()}\n
 // Endpoint to trigger price update
 app.get('/api/update', async (req, res) => {
     try {
+        console.log('Fetching crypto prices...');
         const prices = await getCryptoPrices();
+        console.log('Prices received:', prices);
+        
         const message = formatPriceMessage(prices);
-        await bot.sendMessage(CHAT_ID, message);
-        res.json({ success: true, message: 'Price update sent successfully' });
+        console.log('Formatted message:', message);
+        
+        console.log('Sending to Telegram. Chat ID:', CHAT_ID);
+        const result = await bot.sendMessage(CHAT_ID, message);
+        console.log('Telegram response:', result);
+        
+        res.json({ 
+            success: true, 
+            message: 'Price update sent successfully',
+            prices: prices,
+            telegramResponse: result 
+        });
     } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ success: false, error: 'Failed to send price update' });
+        console.error('Detailed error:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: error.message,
+            stack: error.stack,
+            botToken: process.env.TELEGRAM_BOT_TOKEN ? 'Token exists' : 'No token',
+            chatId: process.env.CHAT_ID ? 'Chat ID exists' : 'No chat ID'
+        });
     }
+});
+
+// Add a test endpoint
+app.get('/api/test', (req, res) => {
+    res.json({
+        environment: {
+            botToken: process.env.TELEGRAM_BOT_TOKEN ? 'Token exists' : 'No token',
+            chatId: process.env.CHAT_ID ? 'Chat ID exists' : 'No chat ID',
+            port: process.env.PORT || 3000
+        }
+    });
 });
 
 // Basic endpoint to keep the server alive

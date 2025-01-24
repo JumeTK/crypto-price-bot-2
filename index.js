@@ -54,8 +54,8 @@ Price: \`$${prices.ethereum.usd.toLocaleString()}\`
 Market Cap: \`${formatMarketCap(prices.ethereum.usd_market_cap)}\`
 
 *PX*
-Price: \`$${prices.not-pixel.usd.toLocaleString()}\`
-Market Cap: \`${formatMarketCap(prices.not-pixel.usd_market_cap)}\`
+Price: \`$${prices['not-pixel'].usd.toLocaleString()}\`
+Market Cap: \`${formatMarketCap(prices['not-pixel'].usd_market_cap)}\`
 
 *XRP*
 Price: \`$${prices.ripple.usd.toLocaleString()}\`

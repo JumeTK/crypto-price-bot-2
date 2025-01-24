@@ -15,7 +15,7 @@ async function getCryptoPrices() {
     try {
         const response = await axios.get('https://api.coingecko.com/api/v3/simple/price', {
             params: {
-                ids: 'bitcoin,ethereum,binancecoin,ripple,cardano,nodecoin',
+                ids: 'bitcoin,ethereum,not-pixel,ripple,cardano,nodecoin',
                 vs_currencies: 'usd',
                 include_market_cap: true
             }
@@ -53,9 +53,9 @@ Market Cap: \`${formatMarketCap(prices.bitcoin.usd_market_cap)}\`
 Price: \`$${prices.ethereum.usd.toLocaleString()}\`
 Market Cap: \`${formatMarketCap(prices.ethereum.usd_market_cap)}\`
 
-*BNB*
-Price: \`$${prices.binancecoin.usd.toLocaleString()}\`
-Market Cap: \`${formatMarketCap(prices.binancecoin.usd_market_cap)}\`
+*PX*
+Price: \`$${prices.not-pixel.usd.toLocaleString()}\`
+Market Cap: \`${formatMarketCap(prices.not-pixel.usd_market_cap)}\`
 
 *XRP*
 Price: \`$${prices.ripple.usd.toLocaleString()}\`
